@@ -1,0 +1,8 @@
+# Dependencies
+env
+
+# Local settings
+fii/localconfig.py
+
+# pyc
+*.pyc

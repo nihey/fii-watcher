@@ -1,0 +1,25 @@
+#!/usr/bin/env casperjs
+
+var casper = require('casper').create();
+
+casper.start('http://bvmf.bmfbovespa.com.br/Fundos-Listados/FundosListados.aspx?tipoFundo=imobiliario&Idioma=pt-br', function() {
+  this.echo(this.evaluate(function() {
+    var get = function(tr, index, attr) {
+      return tr.children[index].children[0][attr];
+    }
+
+    var fiis = Array.prototype.map.call(document.querySelectorAll('table tbody tr'), function(tr) {
+      return {
+        url: get(tr, 0, 'href'),
+        company: get(tr, 0, 'innerHTML'),
+        fund: get(tr, 1, 'innerHTML'),
+        type: get(tr, 2, 'innerHTML'),
+        code: get(tr, 3, 'innerHTML'),
+      }
+    });
+
+    return JSON.stringify(fiis);
+  }));
+});
+
+casper.run();

@@ -1,0 +1,75 @@
+#!/usr/bin/env python
+
+import json
+import subprocess
+from multiprocessing import Process
+
+from fii.models import FII, FIILog
+from fii.database import get_store
+from fii.settings import Config as config
+from fii.utils import log, distribute, notify_change
+
+
+def run(*args):
+    command = ' '.join(args)
+    log('calling "%s"' % (command,))
+
+    for i in xrange(5):
+        stdout = subprocess.Popen(args, stdout=subprocess.PIPE).stdout.read()
+        try:
+            response = json.loads(stdout)
+        except ValueError:
+            log('trying "{}" again'.format(command))
+            continue
+
+        # If nothing was responded try again
+        if response is None:
+            log('trying "{}" again'.format(command))
+            continue
+        return response
+    log('failed to run "{}"'.format(command))
+    return None
+
+
+def watch(fiis):
+    store = get_store()
+
+    for fii in fiis:
+        details = run(config.CASPER_PATH, config.WATCHER_PATH, fii.code)
+        if details is None:
+            continue
+
+        query = {
+            'fii_code': fii.code,
+            'html': details['html'],
+        }
+        fii_log, created = FIILog.get_or_create(store, query, **details)
+        if created:
+            log('created log entry for %s' % (fii.code,))
+            store.commit()
+            notify_change(fii_log)
+        else:
+            log('%s is up to date, skipping' % (fii.code,))
+
+
+def main():
+    store = get_store()
+
+    # Update the FIIs table with all the known FIIs
+    for fii in run(config.CASPER_PATH, config.LISTER_PATH):
+        noop, created = FII.get_or_create(store, {'code': fii['code']}, **fii)
+        if created:
+            log('FII added: {}'.format(fii['code']))
+    # Save all progress so far
+    store.commit()
+
+    # Scrape each FII details, doing several requests at each time
+    fiis_list = distribute(list(store.query(FII)), config.FEED_WORKERS)
+    for fiis in fiis_list:
+        log('starting worker for {} fiis'.format(len(fiis)))
+        process = Process(target=watch, args=(fiis,))
+        process.start()
+
+
+if __name__ == '__main__':
+    main()

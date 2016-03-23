@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+
+import IPython
+
+from fii.utils import *
+from fii.models import *
+from fii.database import get_store
+
+store = get_store()
+
+IPython.embed()

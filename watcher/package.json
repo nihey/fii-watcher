@@ -1,0 +1,15 @@
+{
+  "name": "fii-watcher",
+  "version": "0.0.0",
+  "description": "watch for news on a FII",
+  "main": "bin/watch",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nihey Takizawa",
+  "license": "SEE LICENSE IN README.md",
+  "dependencies": {
+    "casperjs": "^1.1.0-beta5",
+    "phantomjs": "^2.1.3"
+  }
+}

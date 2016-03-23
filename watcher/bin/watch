@@ -1,0 +1,36 @@
+#!/usr/bin/env casperjs
+
+var casper = require('casper').create();
+
+var code = casper.cli.args[0];
+var url = 'http://bvmf.bmfbovespa.com.br/Fundos-Listados/FundosListadosDetalhe.aspx?Sigla='
+          + code + '&tipoFundo=Imobiliario&aba=abaPrincipal&idioma=pt-br';
+casper.start(url, function() {
+  this.echo(this.evaluate(function() {
+    var get = function(tr, index, attr) {
+      return tr.children[index].children[0][attr];
+    }
+
+    var s = document.querySelector.bind(document);
+    var link = s('.tabelaPlantao > div > div:first-child [href]');
+    var date = s('.tabelaPlantao > div > div:first-child .data').innerHTML.split('/');
+    var time = s('.tabelaPlantao > div > div:first-child .hora').innerHTML;
+    var timestamp = date[2] + '-' + date[1] + '-' + date[0] + ' ' + time;
+
+    return JSON.stringify({
+      html: s('.tabelaPlantao > div > div:first-child').innerHTML,
+      notification_date: timestamp,
+      subject: link.innerHTML,
+      link: 'http://bvmf.bmfbovespa.com.br/Fundos-Listados/' +
+            link.getAttribute('onclick').replace(/^.*?(?=Fundos)/, '')
+                .replace(/",".*/, ''),
+    });
+  }));
+});
+
+if (code) {
+  casper.run();
+} else {
+  casper.echo('missing code');
+  casper.exit(1);
+}
