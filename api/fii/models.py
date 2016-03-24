@@ -22,7 +22,10 @@ class BaseORM(Base):
         for klass in klasses:
             for attr in klass.__dict__:
                 if isinstance(getattr(klass, attr), InstrumentedAttribute):
-                    retval[attr] = getattr(self, attr)
+                    # Only allow JSON serializable values
+                    value = getattr(self, attr)
+                    if type(value) in [unicode, str, int, float]:
+                        retval[attr] = getattr(self, attr)
         return retval
 
     @classmethod
@@ -77,7 +80,7 @@ class Watcher(BaseORM):
 
     id = Column(BigInteger, primary_key=True)
     email = Column(Text)
-    status = Column(Text)
+    status = Column(Text, default=STATUS_USER_LIMITED)
 
     fiis = relationship("FII",
                         secondary=watcher_fii_map,

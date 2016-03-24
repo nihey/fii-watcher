@@ -2,6 +2,8 @@
 
 
 class Config(object):
+    DEBUG = False
+
     CASPER_PATH = 'casperjs'
 
     LISTER_PATH = '../watcher/bin/list'
