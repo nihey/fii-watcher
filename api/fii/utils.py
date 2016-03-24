@@ -1,13 +1,24 @@
+from traceback import format_exception
 from datetime import datetime
 import math
 
 import requests
 
+from fii.database import get_store
+from fii.models import Watcher
 from fii.settings import Config
 
 
 def log(string):
     print datetime.now().strftime('%Y-%m-%d %H:%M:%S'), '-', string
+
+
+def send_email(emails, subject, body):
+    requests.get(Config.MAILER_URL, params={
+        'emails': emails,
+        'subject': subject,
+        'body': body,
+    })
 
 
 def distribute(list_, parts):
@@ -34,8 +45,20 @@ def notify_change(fii_log):
         return log('no e-mails for {}, skipping'.format(fii_log.fii_code))
 
     log('sending e-mails for {} to "{}"'.format(fii_log.fii_code, emails))
-    requests.get(Config.MAILER_URL, params={
-        'emails': emails,
-        'subject': subject,
-        'body': body,
-    })
+    send_email(emails, subject, body)
+
+
+def excepthook(type_, value, traceback):
+    store = get_store()
+
+    admins = store.query(Watcher).filter(Watcher.status == 'admin')
+    if admins.count() == 0:
+        return
+
+    emails = ','.join([a.email for a in admins])
+    subject = '[FII] Error: {}'.format(value.message)
+    body = ''.join(format_exception(type_, value, traceback))
+    log(body)
+
+    log('sending error e-mail to "{}"'.format(emails))
+    send_email(emails, subject, body)
