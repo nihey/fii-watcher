@@ -25,7 +25,6 @@ class BaseORM(Base):
                     retval[attr] = getattr(self, attr)
         return retval
 
-
     @classmethod
     def get_or_create(cls, store, query, **kwargs):
         # Auto assign query parameters when creating/updating
@@ -42,9 +41,11 @@ class BaseORM(Base):
 
 
 watcher_fii_map = Table('watcher_fii_map', Base.metadata,
-    Column('watcher_id', BigInteger, ForeignKey('watcher.id')),
-    Column('fii_code', Text, ForeignKey('fii.code')),
-)
+                        Column('watcher_id', BigInteger,
+                               ForeignKey('watcher.id')),
+                        Column('fii_code', Text,
+                               ForeignKey('fii.code')))
+
 
 class FII(BaseORM):
     __tablename__ = 'fii'

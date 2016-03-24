@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 class Config(object):
     CASPER_PATH = 'casperjs'
 
