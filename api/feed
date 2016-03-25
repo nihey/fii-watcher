@@ -6,7 +6,7 @@ import json
 import subprocess
 from multiprocessing import Process
 
-from fii.models import FII, FIILog
+from fii.models import FII, FIILog, watcher_fii_map
 from fii.database import get_store
 from fii.settings import Config as config
 from fii.utils import log, distribute, notify_change, excepthook
@@ -67,12 +67,22 @@ def main():
     # Save all progress so far
     store.commit()
 
-    # Scrape each FII details, doing several requests at each time
-    fiis_list = distribute(list(store.query(FII)), config.FEED_WORKERS)
+    # Scrape each FII details, doing several requests at each time, but don't
+    # bother searching for FIIs that have no watchers
+    fiis_list = store.query(FII).join(watcher_fii_map).all()
+    fiis_list = distribute(fiis_list, config.FEED_WORKERS)
+    processes = []
     for fiis in fiis_list:
         log('starting worker for {} fiis'.format(len(fiis)))
         process = Process(target=watch, args=(fiis,))
         process.start()
+        processes.append(process)
+
+    # Wait all processes to finish
+    for process in processes:
+        process.join()
+
+    log('finished scraping')
 
 
 if __name__ == '__main__':

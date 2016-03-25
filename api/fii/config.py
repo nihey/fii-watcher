@@ -15,6 +15,7 @@ class Config(object):
     DB_NAME = 'fii_watch'
     DB_USER = 'nihey'
     DB_PASS = ''
+    DB_PORT = 5432
     DB_HOST = 'localhost'
 
     MAILER_URL = ''
