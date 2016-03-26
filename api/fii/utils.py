@@ -14,6 +14,9 @@ def log(string):
 
 
 def send_email(emails, subject, body):
+    if emails == '':
+        return
+
     requests.get(Config.MAILER_URL, params={
         'emails': emails,
         'subject': subject,
@@ -40,11 +43,19 @@ def notify_change(fii_log):
     subject = Config.FII_CHANGE_SUBJECT.format(**variables)
     body = Config.FII_CHANGE_BODY.format(**variables)
 
-    # Do not attempt to send e-mails if no email is provided
-    if emails == '':
-        return log('no e-mails for {}, skipping'.format(fii_log.fii_code))
-
     log('sending e-mails for {} to "{}"'.format(fii_log.fii_code, emails))
+    send_email(emails, subject, body)
+
+
+def notify_fail(command):
+    store = get_store()
+    admins = store.query(Watcher).filter(Watcher.status == 'admin')
+
+    emails = ','.join([w.email for w in admins])
+    subject = '[FII] failed to run {}'.format(command)
+    body = 'Error logs may have more details, check it back later'
+
+    log('sending fail log e-mails for "{}"'.format(emails))
     send_email(emails, subject, body)
 
 

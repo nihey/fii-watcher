@@ -9,7 +9,7 @@ from multiprocessing import Process
 from fii.models import FII, FIILog, watcher_fii_map
 from fii.database import get_store
 from fii.settings import Config as config
-from fii.utils import log, distribute, notify_change, excepthook
+from fii.utils import log, distribute, notify_change, notify_fail, excepthook
 
 sys.excepthook = excepthook
 
@@ -32,6 +32,7 @@ def run(*args):
             continue
         return response
     log('failed to run "{}"'.format(command))
+    notify_fail(command)
     return None
 
 
