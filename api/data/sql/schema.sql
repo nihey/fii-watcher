@@ -4,7 +4,8 @@ CREATE TABLE fii(
     company TEXT,
     fund TEXT,
     type TEXT,
-    url TEXT
+    url TEXT,
+    error BOOLEAN
 );
 
 /* A user that watches the FII */

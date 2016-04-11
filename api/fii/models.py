@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from sqlalchemy import Table, Column, BigInteger, Text, DateTime, ForeignKey
+from sqlalchemy import (Table, Column, BigInteger, Text, DateTime, ForeignKey,
+                        Boolean)
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.ext.declarative import declarative_base
@@ -58,6 +59,8 @@ class FII(BaseORM):
     fund = Column(Text)
     type = Column(Text)
     url = Column(Text)
+
+    error = Column(Boolean, default=False)
 
     logs = relationship("FIILog", back_populates="fii")
     watchers = relationship("Watcher",

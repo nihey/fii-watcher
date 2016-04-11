@@ -1,5 +1,10 @@
+from fii.config import Config as DefaultConfig
+
 try:
-    from fii.localconfig import Config
+    from fii.localconfig import Config as LocalConfig
 except ImportError:
-    from fii.config import Config
-Config
+    class Config(DefaultConfig):
+        pass
+else:
+    class Config(LocalConfig, DefaultConfig):
+        pass

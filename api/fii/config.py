@@ -32,3 +32,15 @@ ou
 
 - Nihey Takizawa
 """
+
+    FII_GENERIC_CHANGE_SUBJECT = "[FII] Alteração na página de {fii_code}"
+    FII_GENERIC_CHANGE_BODY = """
+Alguma alteração ocorreu na página de {fii_code}, para acessa-la clique em:
+
+{url}
+
+Isto pode ter sido causado por uma falha nos sistemas da BM&FBovespa, ou uma
+mudança no layout da página.
+
+- Nihey Takizawa
+"""

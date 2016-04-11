@@ -9,7 +9,8 @@ from multiprocessing import Process
 from fii.models import FII, FIILog, watcher_fii_map
 from fii.database import get_store
 from fii.settings import Config as config
-from fii.utils import log, distribute, notify_change, notify_fail, excepthook
+from fii.utils import (log, distribute, notify_change, notify_fail,
+                       excepthook, notify_generic_change)
 
 sys.excepthook = excepthook
 
@@ -42,6 +43,10 @@ def watch(fiis):
     for fii in fiis:
         details = run(config.CASPER_PATH, config.WATCHER_PATH, fii.code)
         if details is None:
+            if not fii.error:
+                notify_generic_change(fii)
+                fii.error = True
+                store.commit()
             continue
 
         query = {
@@ -51,17 +56,19 @@ def watch(fiis):
         fii_log, created = FIILog.get_or_create(store, query, **details)
         if created:
             log('created log entry for %s' % (fii.code,))
-            store.commit()
             notify_change(fii_log)
         else:
             log('%s is up to date, skipping' % (fii.code,))
+
+        fii.error = False
+        store.commit()
 
 
 def main():
     store = get_store()
 
     # Update the FIIs table with all the known FIIs
-    for fii in run(config.CASPER_PATH, config.LISTER_PATH):
+    for fii in run(config.CASPER_PATH, config.LISTER_PATH) or []:
         noop, created = FII.get_or_create(store, {'code': fii['code']}, **fii)
         if created:
             log('FII added: {}'.format(fii['code']))
