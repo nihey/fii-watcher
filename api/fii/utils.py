@@ -1,8 +1,10 @@
 from traceback import format_exception
 from datetime import datetime
 import math
+import json
 
 import requests
+from flask import Response
 
 from fii.database import get_store
 from fii.models import Watcher
@@ -11,6 +13,12 @@ from fii.settings import Config
 
 def log(string):
     print datetime.now().strftime('%Y-%m-%d %H:%M:%S'), '-', string
+
+
+def error_message(code, message):
+    return Response(json.dumps({
+        'error': message
+    }), code, mimetype='application/json')
 
 
 def send_email(emails, subject, body):

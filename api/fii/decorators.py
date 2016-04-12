@@ -10,11 +10,10 @@ def require(*dargs):
         @wraps(func)
         def decorated_function(*args, **kwargs):
             for attr in dargs:
-                try:
-                    request.form[attr]
-                except TypeError:
+                value = request.form.get(attr, request.args.get(attr, None))
+                if value is None:
                     message = json.dumps({'error': 'missing_' + attr})
                     return Response(message, mimetype='application/json')
-                return func(*args, **kwargs)
+            return func(*args, **kwargs)
         return decorated_function
     return inner_require

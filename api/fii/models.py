@@ -89,6 +89,11 @@ class Watcher(BaseORM):
                         secondary=watcher_fii_map,
                         back_populates="watchers")
 
+    def dict(self):
+        default_dict = super(Watcher, self).dict()
+        default_dict['fiis'] = [f.dict() for f in self.fiis]
+        return default_dict
+
 
 class FIILog(BaseORM):
     __tablename__ = 'fii_log'
