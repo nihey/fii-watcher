@@ -1,0 +1,92 @@
+@tashnt: #BDC3C7;
+@slate-gray: #95A5A6;
+@urban: #7F8C8D;
+@green-sea: #16A085;
+@blue-sea: #5BA9EC;
+@enderland: #2ECC71;
+@denim: #34495E;
+@dark-denim: #142230;
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #react-body, [data-reactroot] {
+  margin: 0;
+  height: 100%;
+  background: @blue-sea;
+}
+
+input {
+  border: 1px solid @tashnt;
+  border-radius: 0;
+  background: white;
+  padding: 10px;
+}
+
+button {
+  border: 0;
+  border-radius: 0;
+  background: @denim;
+  padding: 10px;
+  color: white;
+  cursor: pointer;
+  font-family: "Whitney A", "Whitney B", "Avenir", Helvetica, sans-serif;
+  transition: background-color 0.2s ease-out;
+
+  &::-moz-focus-inner {
+    border: 0;
+  }
+
+  &:hover {
+    background: @dark-denim;
+  }
+}
+
+.register-container {
+  height: 100%;
+  display: -ms-flex;
+  display: -webkit-flex;
+  display: flex;
+
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  align-items: center;
+}
+
+.register {
+  text-align: center;
+
+  h1, h4 {
+    display: inline-block;
+    font-family: Helvetica, sans-serif;
+    max-width: 960px;
+    margin-bottom: 0;
+    color: white;
+  }
+
+  h4 {
+    opacity: 0.8;
+    margin-top: 10px;
+    margin-bottom: 25px;
+  }
+
+  > form {
+    display: inline-block;
+    width: 400px;
+
+    * {
+      display: block;
+      width: 100%;
+    }
+
+    *:not(:last-child) {
+      margin-bottom: 5px;
+    }
+
+    button {
+      font-weight: 600;
+    }
+  }
+}
