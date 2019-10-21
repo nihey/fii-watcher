@@ -38,7 +38,7 @@
     "webpack": "^1.10.1"
   },
   "devDependencies": {
-    "eslint": "^1.6.0",
+    "eslint": "^6.5.1",
     "html-loader": "^0.4.3",
     "indexhtml-webpack-plugin": "^0.1.9"
   }
